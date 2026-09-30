@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>互動檢定</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root { --primary:#1FA24C; --accent:#A3E635; --deep:#0b3f2c; --mid:#0e4d36; --wrong:#ef4444; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background: #06281b; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+    }
+    /* 手機框：手機全螢幕、桌機顯示框 */
+    .phone {
+      position: relative; overflow: hidden; width: 100%; max-width: 28rem; min-height: 100dvh;
+      display: flex; flex-direction: column; color: #fff;
+      background: linear-gradient(to bottom, var(--mid), var(--deep) 55%, #072c1e);
+    }
+    @media (min-width: 768px) {
+      .phone { min-height: 812px; max-height: 92vh; border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+    }
+    .glow { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px); }
+    .glow.a { top: -6rem; right: -4rem; width: 18rem; height: 18rem; background: rgba(110,231,183,.15); }
+    .glow.b { top: 33%; left: -5rem; width: 16rem; height: 16rem; background: rgba(190,242,100,.10); }
+    .forest { position: absolute; left: 0; right: 0; bottom: 0; height: 7rem; pointer-events: none; }
+    .forest svg { width: 100%; height: 100%; display: block; }
+
+    header { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center;
+      padding: calc(env(safe-area-inset-top) + 1.1rem) 1.25rem .6rem; font-weight: 900; font-size: .8rem; letter-spacing: .12em; opacity: .9; }
+    main { position: relative; z-index: 1; flex: 1; overflow-x: hidden; overflow-y: auto; padding: .75rem 1.25rem 1.5rem; display: flex; flex-direction: column; }
+    footer { position: relative; z-index: 2; text-align: center; font-size: .6rem; font-weight: 900; letter-spacing: .2em;
+      color: rgba(255,255,255,.45); border-top: 1px solid rgba(255,255,255,.1);
+      padding: .75rem 1rem calc(env(safe-area-inset-bottom) + .75rem); }
+
+    .screen { flex: 1; display: flex; flex-direction: column; gap: 1rem; animation: fadeUp .4s ease-out both; }
+    .center { margin: auto 0; display: flex; flex-direction: column; gap: 1rem; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @media (prefers-reduced-motion: reduce) { .screen, .hero-logo { animation: none !important; } }
+
+    .card { background: #fff; color: #1e293b; border-radius: 1.5rem; box-shadow: 0 16px 40px -12px rgba(0,0,0,.4); position: relative; overflow: hidden; }
+    .card.bar::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--primary)); }
+    .hero { padding: 1.5rem .75rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: .9rem; }
+    .hero-logo { width: 100%; max-width: 320px; height: auto; animation: floaty 5s ease-in-out infinite; }
+    .hero-logo-text { font-size: 1.9rem; font-weight: 900; color: var(--deep); }
+    .pill { display: inline-flex; align-items: center; gap: .4rem; background: var(--primary); color: #fff;
+      font-size: 1.3rem; font-weight: 900; letter-spacing: .08em; padding: .5rem 1.4rem; border-radius: 2rem; }
+    .muted { color: #64748b; font-size: .82rem; font-weight: 500; margin: 0; }
+
+    .glass { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 1rem;
+      padding: 1rem 1rem 1rem 1.25rem; position: relative; overflow: hidden; font-size: .88rem; line-height: 1.7; }
+    .glass::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--accent), var(--primary)); }
+    .glass p { margin: 0; }
+    .glass .rule { margin-top: .6rem; padding-top: .6rem; border-top: 1px solid rgba(255,255,255,.1); font-size: .76rem; color: rgba(255,255,255,.72); }
+    .hl { color: var(--accent); font-weight: 700; }
+
+    label { display: block; font-size: .66rem; font-weight: 900; letter-spacing: .15em; color: rgba(255,255,255,.6); margin: 0 0 .4rem .25rem; }
+    input { width: 100%; padding: 1rem 1.2rem; border-radius: .75rem; border: 2px solid transparent; font: inherit; font-size: 1rem; color: #0f172a; }
+    input:focus { outline: none; border-color: var(--accent); }
+    input.err { border-color: var(--wrong); }
+    .err-msg { color: #fecaca; font-size: .75rem; margin: .4rem 0 0 .25rem; font-weight: 500; }
+
+    button { font: inherit; cursor: pointer; border: none; }
+    button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    .btn { width: 100%; border-radius: .75rem; padding: 1rem; font-weight: 900; letter-spacing: .12em; font-size: .95rem;
+      background: linear-gradient(90deg, var(--accent), var(--primary)); color: #052e1c; box-shadow: 0 10px 25px -6px rgba(0,0,0,.35);
+      transition: transform .15s; }
+    .btn:active { transform: scale(.97); }
+    .btn.ghost { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.85); box-shadow: none; }
+    .row { display: flex; gap: .75rem; }
+    .row .ghost { flex: 1; } .row .grow { flex: 2; }
+
+    .top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+    .name-tag { font-size: .85rem; font-weight: 700; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.15);
+      padding: .25rem .8rem; border-radius: 2rem; max-width: 58%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .count { font-size: .7rem; font-weight: 900; letter-spacing: .2em; color: var(--accent); }
+    .progress { height: 6px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; margin-top: .6rem; }
+    .progress div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--primary)); transition: width .5s; }
+
+    .question { padding: 1.3rem 1.2rem 1.1rem; font-size: 1.1rem; font-weight: 700; line-height: 1.6; margin: 0; }
+    .options { display: flex; flex-direction: column; gap: .75rem; }
+    .opt { display: flex; gap: .75rem; align-items: flex-start; text-align: left; width: 100%; background: #fff; color: #334155;
+      border-radius: .75rem; padding: 1rem; font-size: .95rem; line-height: 1.6; box-shadow: 0 4px 10px rgba(0,0,0,.15); transition: box-shadow .2s, background .2s; }
+    .opt .key { flex: none; width: 1.5rem; height: 1.5rem; border-radius: .35rem; display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 900; background: #d1fae5; color: #047857; }
+    .opt.right { background: #ecfdf5; color: #064e3b; box-shadow: 0 0 0 2px var(--primary); font-weight: 700; }
+    .opt.right .key { background: var(--primary); color: #fff; }
+    .opt.wrong { background: #fef2f2; color: #7f1d1d; box-shadow: 0 0 0 2px var(--wrong); font-weight: 700; }
+    .opt.wrong .key { background: var(--wrong); color: #fff; }
+
+    .verdict { text-align: center; }
+    .badge { display: inline-flex; width: 4.5rem; height: 4.5rem; border-radius: 50%; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: 900; }
+    .badge.ok { background: rgba(16,185,129,.2); color: var(--accent); }
+    .badge.no { background: rgba(239,68,68,.2); color: #fca5a5; }
+    .verdict .label { font-size: .75rem; font-weight: 900; letter-spacing: .2em; margin: .8rem 0 .1rem; }
+    .verdict h3 { margin: 0; font-size: 1.5rem; font-weight: 900; }
+    .explain { padding: 1.4rem 1.3rem; font-size: .95rem; line-height: 1.75; font-weight: 500; margin: 0; }
+
+    .cert { padding: 1.4rem 1.2rem 1.2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: .8rem; }
+    .cert .hero-logo { max-width: 200px; animation: none; }
+    .cert .verified { font-size: .78rem; font-weight: 700; letter-spacing: .2em; color: #94a3b8; margin: 0; }
+    .cert .who { background: #ecfdf5; border: 1px solid #d1fae5; border-radius: .5rem; padding: .35rem 1.4rem; font-size: 1.1rem; font-weight: 900;
+      color: #064e3b; letter-spacing: .1em; word-break: break-all; max-width: 100%; }
+    .redeem { width: 100%; margin-top: .4rem; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
+    .redeem div { background: linear-gradient(90deg, #f7fee7, #ecfdf5); border: 1px solid #d1fae5; border-radius: .75rem; padding: .8rem; }
+    .redeem p { margin: 0; font-size: .82rem; color: #475569; font-weight: 500; }
+    .redeem strong { display: block; margin-top: .25rem; color: #047857; font-size: 1.05rem; font-weight: 900; }
+    .extras { display: flex; gap: .6rem; align-items: stretch; }
+    .prize-box { width: 6rem; flex: none; background: #fff; border-radius: .75rem; display: flex; align-items: center; justify-content: center; padding: .5rem; font-size: 2.2rem; }
+    .prize-box img { display: block; width: 100%; height: auto; max-height: 8rem; object-fit: contain; }
+    .fact { flex: 1; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: .75rem; padding: .85rem; }
+    .fact h4 { margin: 0 0 .3rem; font-size: .95rem; font-weight: 900; color: var(--accent); letter-spacing: .05em; }
+    .fact p { margin: 0; font-size: .85rem; line-height: 1.65; color: rgba(255,255,255,.82); }
+    .again { width: 3.5rem; flex: none; border-radius: .75rem; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.9);
+      font-weight: 700; font-size: .85rem; letter-spacing: .3em; writing-mode: vertical-rl; text-orientation: upright; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="glow a"></div><div class="glow b"></div>
+    <div class="forest"><svg viewBox="0 0 400 108" preserveAspectRatio="none">
+      <path id="treeBack" fill="#15623f" opacity="0.55"></path><path id="treeFront" fill="#06291c"></path>
+    </svg></div>
+    <header><span id="organizer"></span><span id="brand"></span></header>
+    <main id="app"></main>
+    <footer id="footer"></footer>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="kit.js"></script>
+  <script>
+  (function () {
+    var K = window.EVENT_KIT, Q = K.quiz, ev = K.event, esc = kitEsc;
+    var app = document.getElementById("app");
+    var LETTERS = "ABCDEFGH";
+    var state = { nickname: "", step: "welcome", q: 0, order: [], selected: null, error: false };
+
+    document.title = Q.title + "｜" + ev.name;
+    document.getElementById("organizer").textContent = ev.organizer || "";
+    document.getElementById("brand").textContent = ev.brand || "";
+    document.getElementById("footer").textContent = (ev.footer || "") + " ・ " + (ev.tagline || "");
+    document.getElementById("treeBack").setAttribute("d", kitTrees(400, 8, 55, 30, 30, 50));
+    document.getElementById("treeFront").setAttribute("d", kitTrees(400, 13, 88, 22, 28, 20));
+
+    function shuffled(n) {
+      var a = []; for (var i = 0; i < n; i++) a.push(i);
+      for (var j = a.length - 1; j > 0; j--) { var k = Math.floor(Math.random() * (j + 1)); var t = a[j]; a[j] = a[k]; a[k] = t; }
+      return a;
+    }
+    function current() { return Q.questions[state.q]; }
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function goQuestion(i) { state.q = i; state.order = shuffled(Q.questions[i].options.length); state.selected = null; state.step = "quiz"; render(); }
+
+    function welcome() {
+      return '<div class="screen"><div class="center">' +
+        '<div class="card hero"><div id="logo"></div>' +
+        '<span class="pill">✦ ' + esc(Q.title) + '</span><p class="muted">' + esc(ev.tagline) + '</p></div>' +
+        '<div class="glass"><p>完成檢定好禮：<br>可獲得 <span class="hl">' + esc(Q.prize.name) + '</span>（' + esc(Q.prize.note) + '）。</p>' +
+        '<p class="rule">' + esc(Q.intro) + '</p></div>' +
+        '<form id="start"><label for="nick">' + esc(Q.nicknameLabel) + '</label>' +
+        '<input id="nick" type="text" enterkeyhint="go" maxlength="20" placeholder="' + esc(Q.nicknamePlaceholder) + '" value="' + esc(state.nickname) + '"' + (state.error ? ' class="err"' : "") + '>' +
+        (state.error ? '<p class="err-msg">✕ 請先輸入暱稱才能開始</p>' : "") +
+        '<button class="btn" type="submit" style="margin-top:.8rem">' + esc(Q.startLabel) + ' ›</button></form>' +
+        '</div></div>';
+    }
+
+    function quiz() {
+      var q = current(), total = Q.questions.length;
+      var opts = state.order.map(function (oi, idx) {
+        var o = q.options[oi], cls = "";
+        if (state.selected === idx) cls = o.correct ? " right" : " wrong";
+        return '<button class="opt' + cls + '" data-idx="' + idx + '"' + (state.selected !== null ? " disabled" : "") + '>' +
+          '<span class="key">' + LETTERS[idx] + '</span><span>' + esc(o.text) + '</span></button>';
+      }).join("");
+      return '<div class="screen"><div>' +
+        '<div class="top"><span class="name-tag">' + esc(state.nickname) + '</span><span class="count">第 ' + pad(state.q + 1) + ' / ' + pad(total) + ' 題</span></div>' +
+        '<div class="progress"><div style="width:' + ((state.q + 1) / total * 100) + '%"></div></div></div>' +
+        '<div class="center"><div class="card bar"><h2 class="question">' + esc(q.question) + '</h2></div>' +
+        '<div class="options">' + opts + '</div></div></div>';
+    }
+
+    function isCorrect() { var q = current(); return !!q.options[state.order[state.selected]].correct; }
+
+    function feedback() {
+      var ok = isCorrect(), last = state.q === Q.questions.length - 1;
+      var next = ok ? (last ? "看結果 ›" : "下一題 ›") : "↺ 重答這一題";
+      return '<div class="screen"><div class="center">' +
+        '<div class="verdict"><span class="badge ' + (ok ? "ok" : "no") + '">' + (ok ? "✓" : "✕") + '</span>' +
+        '<p class="label" style="color:' + (ok ? "var(--accent)" : "#fca5a5") + '">' + (ok ? "答對了！" : "再想想～") + '</p><h3>知識解析</h3></div>' +
+        '<div class="card bar"><p class="explain">' + esc(current().explanation) + '</p></div></div>' +
+        '<div class="row">' + (state.q > 0 ? '<button class="btn ghost" id="prev">‹ 上一題</button>' : "") +
+        '<button class="btn grow" id="next">' + next + '</button></div></div>';
+    }
+
+    function success() {
+      var P = Q.prize;
+      return '<div class="screen">' +
+        '<h2 style="text-align:center;margin:.2rem 0 0;font-size:1.25rem;font-weight:900">✦ 恭喜通關！ ✦</h2>' +
+        '<div class="card bar cert"><div id="logo"></div><p class="verified">認證夥伴 / VERIFIED</p>' +
+        '<div class="who">' + esc(state.nickname) + '</div><p class="muted" style="max-width:20rem">' + esc(Q.successText) + '</p>' +
+        '<div class="redeem"><div><p>' + esc(P.redeemText) + '</p><strong>' + esc(P.name) + ' 一份（' + esc(P.note) + '）</strong></div></div></div>' +
+        '<div class="extras"><div class="prize-box" id="prizeBox">🎁</div>' +
+        '<div class="fact"><h4>' + esc(Q.funFact.title) + '</h4><p>' + esc(Q.funFact.text) + '</p></div>' +
+        '<button class="again" id="again">再玩一次</button></div></div>';
+    }
+
+    function render() {
+      var views = { welcome: welcome, quiz: quiz, feedback: feedback, success: success };
+      app.innerHTML = views[state.step]();
+      app.scrollTop = 0;
+      var logo = document.getElementById("logo");
+      if (logo) kitLogo(logo, "hero-logo");
+
+      if (state.step === "welcome") {
+        var nick = document.getElementById("nick");
+        nick.addEventListener("input", function () { state.nickname = nick.value; });
+        document.getElementById("start").addEventListener("submit", function (e) {
+          e.preventDefault();
+          state.nickname = nick.value.trim();
+          if (!state.nickname) { state.error = true; render(); document.getElementById("nick").focus(); return; }
+          state.error = false; goQuestion(0);
+        });
+      }
+      if (state.step === "quiz") {
+        app.querySelectorAll(".opt").forEach(function (b) {
+          b.addEventListener("click", function () {
+            if (state.selected !== null) return;
+            state.selected = Number(b.dataset.idx); render();
+            setTimeout(function () { state.step = "feedback"; render(); }, 450);
+          });
+        });
+      }
+      if (state.step === "feedback") {
+        document.getElementById("next").addEventListener("click", function () {
+          if (!isCorrect()) { state.selected = null; state.step = "quiz"; render(); return; }
+          if (state.q < Q.questions.length - 1) goQuestion(state.q + 1);
+          else { kitTrack("complete"); state.step = "success"; render(); }
+        });
+        var prev = document.getElementById("prev");
+        if (prev) prev.addEventListener("click", function () { goQuestion(state.q - 1); });
+      }
+      if (state.step === "success") {
+        if (Q.prize.image) {
+          var img = new Image(); img.alt = Q.prize.name;
+          img.onload = function () { var box = document.getElementById("prizeBox"); if (box) { box.innerHTML = ""; box.appendChild(img); } };
+          img.src = Q.prize.image;
+        }
+        document.getElementById("again").addEventListener("click", function () { state.nickname = ""; state.step = "welcome"; render(); });
+      }
+    }
+
+    kitTrack("app_open");
+    render();
+  })();
+  </script>
+</body>
+</html>

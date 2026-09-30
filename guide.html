@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Audio Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#1FA24C; --accent:#A3E635; --deep:#0b3f2c; --mid:#0e4d36;
+    --paper:#F2F7F3; --card:#FFFFFF; --ink:#12241A; --ink-soft:#4E6156; --line:#DCE8DF; --hl:#DDF2E4;
+  }
+  *{box-sizing:border-box}
+  html,body{-webkit-tap-highlight-color:transparent}
+  body{margin:0; background:var(--paper); color:var(--ink); line-height:1.65;
+    font-family:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
+  img{max-width:100%}
+
+  .hero{position:relative; overflow:hidden; color:#fff; padding:1.1rem 1.25rem 5.5rem;
+    background:linear-gradient(160deg,var(--deep) 0%,var(--mid) 60%,var(--deep) 100%)}
+  .hero-top{max-width:40rem; margin:0 auto 1.4rem; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    font-weight:900; font-size:.8rem; letter-spacing:.1em}
+  .pill{font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap;
+    border:1px solid rgba(255,255,255,.4); border-radius:2rem; padding:.3rem .8rem; color:#DFF2E5}
+  .hero-card{position:relative; z-index:2; max-width:40rem; margin:0 auto; background:#fff; border-radius:1.4rem;
+    padding:1.6rem 1.4rem 1.5rem; box-shadow:0 18px 40px rgba(4,32,20,.35); text-align:center}
+  .logo{max-width:290px; width:80%; margin:0 auto; display:block}
+  .logo-text{font-size:1.6rem; font-weight:900; color:var(--deep)}
+  .hero-card h1{font-size:1.28rem; font-weight:900; color:var(--deep); margin:.9rem 0 .15rem; text-wrap:balance; line-height:1.35}
+  .sub{font-size:.85rem; color:var(--ink-soft); margin:0}
+  .tour-pill{display:inline-flex; margin-top:.9rem; background:var(--primary); color:#fff; border-radius:2rem;
+    font-size:.82rem; font-weight:700; padding:.4rem 1.1rem}
+  .forest{position:absolute; bottom:-1px; left:0; right:0; height:6.5rem; z-index:1; pointer-events:none}
+  .forest svg{width:100%; height:100%; display:block}
+
+  .wrap{max-width:40rem; margin:0 auto; padding:1.5rem 1.25rem 0}
+  .howto{background:#fff; border:1px solid var(--line); border-radius:1rem; padding:.9rem 1.1rem; font-size:.86rem;
+    color:var(--ink-soft); box-shadow:0 4px 14px rgba(4,32,20,.05); margin-bottom:1.5rem}
+  .howto strong{color:var(--primary)}
+  .warn{display:none; margin-bottom:1.5rem; padding:.8rem 1rem; border-radius:.8rem; background:#FDF3E7; color:#7A4A12; font-size:.85rem}
+
+  .board{background:var(--card); border-radius:1.3rem; overflow:hidden; box-shadow:0 8px 24px rgba(4,32,20,.07);
+    margin-bottom:1.4rem; padding:1.4rem 1.3rem 1.3rem; animation:fadeUp .45s ease-out both}
+  .board-head{display:flex; gap:.9rem; align-items:flex-start}
+  .num{flex:none; width:2.5rem; height:2.5rem; border-radius:50%; background:var(--primary); color:#fff; font-weight:900;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.18)}
+  .stage{font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; color:var(--primary); font-weight:900; margin:0 0 .15rem}
+  h2{font-size:1.12rem; font-weight:900; line-height:1.35; margin:0; text-wrap:balance; color:var(--deep)}
+  .h2sub{font-size:.82rem; color:var(--ink-soft); margin:.2rem 0 0}
+  .controls{display:flex; gap:.6rem; margin:1.1rem 0 1rem; flex-wrap:wrap}
+  button{font:inherit; cursor:pointer; border-radius:2rem; border:none; padding:.55rem 1.3rem; font-weight:700; font-size:.9rem}
+  button:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+  .play{background:var(--primary); color:#fff}
+  .play[data-state="playing"]{background:var(--deep)}
+  .stop{background:transparent; color:var(--ink-soft); border:1.5px solid var(--line)}
+  .script{font-size:.98rem}
+  .script span{border-radius:.25rem; padding:0 .1rem}
+  .script span.now{background:var(--hl)}
+  details{margin-top:1.1rem; border-top:1px dashed var(--line); padding-top:.8rem}
+  summary{cursor:pointer; font-size:.78rem; font-weight:900; color:var(--primary); letter-spacing:.08em; text-transform:uppercase}
+  .full{font-size:.92rem; color:var(--ink-soft); margin-top:.6rem}
+  .note{margin-top:1rem; padding:.7rem .9rem; border-radius:.8rem; background:var(--paper); font-size:.83rem; color:var(--ink-soft)}
+
+  .foot{margin-top:2.5rem; background:var(--deep); color:#B9D6C4; padding:1.6rem 1.25rem 2rem; text-align:center; font-size:.75rem}
+  @keyframes fadeUp{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){ .board{animation:none} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-top"><span id="organizer"></span><span class="pill" id="pill"></span></div>
+  <div class="hero-card">
+    <div id="logo"></div>
+    <h1 id="title"></h1>
+    <p class="sub" id="subtitle"></p>
+    <span class="tour-pill" id="duration"></span>
+  </div>
+  <div class="forest"><svg viewBox="0 0 400 108" preserveAspectRatio="none">
+    <path id="treeBack" fill="#15623f" opacity="0.55"></path><path id="treeFront" fill="#06291c"></path>
+  </svg></div>
+</header>
+
+<div class="wrap">
+  <div class="howto" id="howto"></div>
+  <div class="warn" id="warn"></div>
+  <div id="boards"></div>
+</div>
+
+<footer class="foot" id="footer"></footer>
+
+<script src="config.js"></script>
+<script src="kit.js"></script>
+<script>
+(function(){
+  var K = window.EVENT_KIT, G = K.guide, ev = K.event, esc = kitEsc;
+
+  document.documentElement.lang = (G.lang || "en").split("-")[0];
+  document.title = G.title + " · " + ev.name;
+  document.getElementById("organizer").textContent = ev.organizer || "";
+  document.getElementById("pill").textContent = G.pill || "";
+  document.getElementById("title").textContent = G.title || "";
+  document.getElementById("subtitle").textContent = G.subtitle || "";
+  document.getElementById("duration").textContent = "▶ " + (G.duration || "");
+  document.getElementById("howto").innerHTML = kitFmt(G.howto);
+  document.getElementById("warn").textContent = G.unsupported || "";
+  document.getElementById("footer").textContent = ev.footer || "";
+  document.getElementById("treeBack").setAttribute("d", kitTrees(400, 8, 55, 30, 30, 50));
+  document.getElementById("treeFront").setAttribute("d", kitTrees(400, 13, 88, 22, 28, 20));
+  kitLogo(document.getElementById("logo"), "logo");
+
+  document.getElementById("boards").innerHTML = G.boards.map(function(b, i){
+    return '<section class="board">' +
+      '<div class="board-head"><div class="num">' + (i + 1) + '</div><div>' +
+      '<p class="stage">' + esc(b.stage) + '</p><h2>' + esc(b.title) + '</h2>' +
+      (b.subtitle ? '<p class="h2sub">' + esc(b.subtitle) + '</p>' : '') + '</div></div>' +
+      '<div class="controls"><button class="play">' + esc(G.playLabel) + '</button><button class="stop">' + esc(G.stopLabel) + '</button></div>' +
+      '<div class="script">' + esc(b.script) + '</div>' +
+      (b.transcript ? '<details><summary>' + esc(G.transcriptLabel) + '</summary><div class="full">' + esc(b.transcript) + '</div></details>' : '') +
+      (b.note ? '<p class="note">' + esc(b.note) + '</p>' : '') +
+      '</section>';
+  }).join("");
+
+  kitTrack("guide_open");
+
+  var synth = window.speechSynthesis;
+  if(!synth){ document.getElementById("warn").style.display = "block"; document.querySelectorAll(".controls").forEach(function(c){ c.style.display = "none"; }); return; }
+
+  // 把導覽稿切成一句一句，朗讀時逐句高亮（支援中英日標點）
+  document.querySelectorAll(".script").forEach(function(el){
+    var text = el.textContent.trim();
+    var parts = text.match(/[^.?!。？！]+[.?!。？！]+(\s|$)|[^.?!。？！]+$/g) || [text];
+    el.textContent = "";
+    parts.forEach(function(s){ var sp = document.createElement("span"); sp.textContent = s; el.appendChild(sp); });
+  });
+
+  var current = null, lang = G.lang || "en-US", prefix = lang.split("-")[0].toLowerCase();
+
+  function pickVoice(){
+    var vs = synth.getVoices();
+    return vs.find(function(v){ return v.lang.replace("_", "-").toLowerCase() === lang.toLowerCase(); }) ||
+           vs.find(function(v){ return v.lang.toLowerCase().indexOf(prefix) === 0; }) || null;
+  }
+  function clearHl(){ document.querySelectorAll(".script span.now").forEach(function(s){ s.classList.remove("now"); }); }
+  function stopAll(){
+    if(current) current.cancelled = true;
+    synth.cancel(); clearHl();
+    document.querySelectorAll(".play").forEach(function(b){ b.dataset.state = ""; b.textContent = G.playLabel; });
+    current = null;
+  }
+  function speakFrom(st){
+    if(st.cancelled) return;
+    if(st.i >= st.spans.length){ stopAll(); return; }
+    clearHl();
+    var span = st.spans[st.i];
+    span.classList.add("now");
+    span.scrollIntoView({block:"center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+    var u = new SpeechSynthesisUtterance(span.textContent);
+    u.lang = lang;
+    var v = pickVoice(); if(v) u.voice = v;
+    u.onend = u.onerror = function(){ st.i++; speakFrom(st); };
+    synth.speak(u);
+  }
+
+  document.querySelectorAll(".board").forEach(function(board){
+    var playBtn = board.querySelector(".play");
+    playBtn.addEventListener("click", function(){
+      if(current && current.board === board && !current.cancelled){
+        if(synth.paused){ synth.resume(); playBtn.textContent = G.pauseLabel; }
+        else { synth.pause(); playBtn.textContent = G.resumeLabel; }
+        return;
+      }
+      stopAll();
+      current = { board: board, spans: Array.prototype.slice.call(board.querySelectorAll(".script span")), i: 0, cancelled: false };
+      playBtn.dataset.state = "playing"; playBtn.textContent = G.pauseLabel;
+      kitTrack("guide_play");
+      speakFrom(current);
+    });
+    board.querySelector(".stop").addEventListener("click", stopAll);
+  });
+  window.addEventListener("beforeunload", function(){ synth.cancel(); });
+})();
+</script>
+</body>
+</html>

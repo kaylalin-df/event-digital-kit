@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工作人員教育訓練</title>
+<style>
+  :root{
+    --primary:#1FA24C; --accent:#A3E635; --deep:#0b3f2c; --mid:#0e4d36;
+    --paper:#f6f8f3; --card:#ffffff; --ink:#1e2b22; --ink-soft:#54655a; --forest:#1d5c3e; --forest-deep:#123f2a;
+    --moss:#6f9a45; --sand:#b98f4e; --line:#dde5da; --quote-bg:#eef4ea; --note-bg:#f4efe4; --shadow:0 1px 3px rgba(20,40,28,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#141a15; --card:#1c241d; --ink:#e8eee6; --ink-soft:#a4b3a4; --forest:#6fbf8f; --forest-deep:#8fd4ab;
+      --moss:#9dc46e; --sand:#d4b073; --line:#2e3a2f; --quote-bg:#232e23; --note-bg:#2a2619; --shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#141a15; --card:#1c241d; --ink:#e8eee6; --ink-soft:#a4b3a4; --forest:#6fbf8f; --forest-deep:#8fd4ab;
+    --moss:#9dc46e; --sand:#d4b073; --line:#2e3a2f; --quote-bg:#232e23; --note-bg:#2a2619; --shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+  body{background:var(--paper); color:var(--ink); line-height:1.8; margin:0; padding:2.5rem 1.25rem 4rem;
+    font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif}
+  main{max-width:760px; margin:0 auto}
+  header.hero{border-bottom:3px solid var(--forest); padding-bottom:1.5rem; margin-bottom:2rem}
+  .hero-logo{display:block; max-height:100px; max-width:100%; width:auto; margin-bottom:1rem; background:#fff; border-radius:8px; padding:.4rem}
+  .hero-logo-text{display:block; font-size:1.3rem; font-weight:900; color:var(--forest); margin-bottom:.6rem}
+  .eyebrow{font-size:.8rem; letter-spacing:.18em; color:var(--moss); font-weight:700; margin:0}
+  h1{font-size:1.9rem; line-height:1.35; margin:.4rem 0 .3rem; color:var(--forest-deep); text-wrap:balance}
+  .sub{color:var(--ink-soft); margin:0}
+  h2{font-size:1.25rem; color:var(--forest-deep); margin:2.6rem 0 .9rem; padding-left:.7rem; border-left:4px solid var(--moss)}
+  h3{font-size:1.02rem; margin:.2rem 0 .4rem; color:var(--forest)}
+  h4{font-size:.95rem; margin:1rem 0 .3rem; color:var(--forest)}
+  p{margin:.5rem 0}
+  ul,ol{padding-left:1.4rem; margin:.5rem 0}
+  li{margin:.35rem 0}
+  strong{color:var(--forest-deep)}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:1.1rem 1.3rem; margin:1rem 0; box-shadow:var(--shadow)}
+  .zone-tag{display:inline-block; font-size:.75rem; font-weight:700; letter-spacing:.08em; color:#fff; background:var(--forest);
+    border-radius:4px; padding:.1rem .55rem; margin-right:.5rem; vertical-align:middle}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .zone-tag{color:#10241a} }
+  :root[data-theme="dark"] .zone-tag{color:#10241a}
+  .script{background:var(--quote-bg); border-left:3px solid var(--sand); border-radius:0 8px 8px 0; padding:.7rem 1rem; margin:.7rem 0; font-size:.95rem}
+  .script::before{content:"💬 引導話術（照著說就可以）"; display:block; font-size:.72rem; font-weight:700; letter-spacing:.12em; color:var(--sand); margin-bottom:.25rem}
+  .note{background:var(--note-bg); border-radius:8px; padding:.7rem 1rem; margin:.7rem 0; font-size:.93rem}
+  table{border-collapse:collapse; width:100%; font-size:.92rem}
+  .table-wrap{overflow-x:auto}
+  th,td{border:1px solid var(--line); padding:.5rem .7rem; text-align:left; vertical-align:top}
+  th{background:var(--quote-bg); color:var(--forest-deep); white-space:nowrap}
+  details{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.6rem .9rem; margin:.5rem 0}
+  summary{cursor:pointer; font-weight:700; color:var(--forest)}
+  summary:focus-visible{outline:2px solid var(--moss); outline-offset:2px}
+  .ans{margin:.5rem 0 .2rem}
+  .checklist{list-style:none; padding-left:0}
+  .checklist li::before{content:"☐ "; color:var(--moss); font-weight:700}
+  .footnote{color:var(--ink-soft); font-size:.85rem; border-top:1px solid var(--line); margin-top:3rem; padding-top:1rem}
+</style>
+</head>
+<body>
+<main id="page"></main>
+
+<script src="config.js"></script>
+<script src="kit.js"></script>
+<script>
+(function(){
+  var K = window.EVENT_KIT, T = K.training, ev = K.event, esc = kitEsc, fmt = kitFmt;
+  var n = ["零","一","二","三","四","五","六","七","八","九"], sec = 0;
+  function h2(title){ return '<h2>' + n[sec++] + '、' + esc(title) + '</h2>'; }
+
+  document.title = T.title + "｜" + ev.name;
+  var html = '<header class="hero"><div id="logo"></div>' +
+    '<p class="eyebrow">' + esc([ev.organizer, ev.brand].filter(Boolean).join(" × ")) + '</p>' +
+    '<h1>' + esc(ev.name) + ' — ' + esc(T.title) + '</h1><p class="sub">' + esc(T.subtitle) + '</p></header>';
+
+  if(T.concepts && T.concepts.length){
+    html += h2("開始之前：一定要懂的觀念");
+    T.concepts.forEach(function(c){
+      html += '<div class="card"><h3>' + esc(c.title) + '</h3>' + c.paragraphs.map(function(p){ return '<p>' + fmt(p) + '</p>'; }).join("") + '</div>';
+    });
+  }
+  if(T.glossary && T.glossary.length){
+    html += h2("看懂關鍵名詞") + '<div class="table-wrap"><table><tr><th>名詞</th><th>白話解釋</th></tr>' +
+      T.glossary.map(function(g){ return '<tr><td><strong>' + esc(g.term) + '</strong></td><td>' + fmt(g.meaning) + '</td></tr>'; }).join("") + '</table></div>';
+  }
+  if(T.pitch){
+    html += h2("開場話術") + '<div class="card"><p><strong>一句話版本：</strong>' + fmt(T.pitch.oneLiner) + '</p>' +
+      '<div class="script">' + esc(T.pitch.script) + '</div></div>';
+  }
+  if(T.zones && T.zones.length){
+    html += h2("展區動線與引導流程（依序帶完）");
+    T.zones.forEach(function(z){
+      html += '<div class="card"><h3><span class="zone-tag">' + esc(z.tag) + '</span>' + esc(z.title) + '</h3>' +
+        (z.background ? '<div class="note">' + fmt(z.background) + '</div>' : '') +
+        (z.points && z.points.length ? '<h4>這一區要講的重點</h4><ul>' + z.points.map(function(p){ return '<li>' + fmt(p) + '</li>'; }).join("") + '</ul>' : '') +
+        (z.script ? '<div class="script">' + esc(z.script) + '</div>' : '') +
+        (z.followUp ? '<p><strong>若被追問「' + esc(z.followUp.q) + '」</strong>→ ' + fmt(z.followUp.a) + '</p>' : '') + '</div>';
+    });
+  }
+  // 檢定題目與答案直接讀取檢定頁的題庫，換題時訓練頁會自動同步
+  var qs = (K.quiz && K.quiz.questions) || [];
+  if(qs.length){
+    html += h2("檢定題目與答案（工作人員必背）");
+    qs.forEach(function(q){
+      var right = q.options.filter(function(o){ return o.correct; }).map(function(o){ return o.text; }).join("／");
+      html += '<details><summary>' + esc(q.question) + '</summary><p class="ans"><strong>答：' + esc(right) + '</strong></p>' +
+        (q.hint ? '<p class="ans">卡住時的引導：「' + esc(q.hint) + '」</p>' : '') + '</details>';
+    });
+  }
+  if(T.faq && T.faq.length){
+    html += h2("現場常見 Q&A") + T.faq.map(function(f){ return '<details><summary>Q：' + esc(f.q) + '</summary><p class="ans">' + fmt(f.a) + '</p></details>'; }).join("");
+  }
+  if(T.checklist && T.checklist.length){
+    html += h2("上場前檢查清單") + '<ul class="checklist">' + T.checklist.map(function(c){ return '<li>' + fmt(c) + '</li>'; }).join("") + '</ul>';
+  }
+  if(T.sources) html += '<p class="footnote">' + esc(T.sources) + '</p>';
+
+  document.getElementById("page").innerHTML = html;
+  kitLogo(document.getElementById("logo"), "hero-logo");
+  kitTrack("training_open");
+})();
+</script>
+</body>
+</html>

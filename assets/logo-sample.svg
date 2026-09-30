@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" role="img" aria-label="循環生活節">
+  <g fill="none" stroke="#1FA24C" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M60 28a34 34 0 0 1 30 18"/>
+    <path d="M94 60a34 34 0 0 1-24 32"/>
+    <path d="M44 90a34 34 0 0 1-14-44"/>
+    <path d="M80 44l11 3 3-11"/>
+    <path d="M80 86l-10 6 6 10"/>
+    <path d="M26 58l4-12 12 4"/>
+  </g>
+  <text x="116" y="62" font-family="'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif" font-size="42" font-weight="900" fill="#0b3f2c">循環生活節</text>
+  <text x="118" y="92" font-family="system-ui,sans-serif" font-size="15" font-weight="700" letter-spacing="3" fill="#1FA24C">CIRCULAR LIVING FEST</text>
+</svg>
